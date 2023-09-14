@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>getDirtyCount() after awaiting editor.load()</title>
+  <script src="https://unpkg.com/grapesjs@0.21.5"></script>
+  <link rel="stylesheet" href="https://unpkg.com/grapesjs/dist/css/grapes.min.css">
+</head>
+<body>
+  <div id="gjs"></div>
+  <script type="module">
+    const editor = grapesjs.init({
+      container: '#gjs',
+      plugins: [
+        ed => ed.Storage.add('example', {
+          load() {
+            const result = {
+              pages: [ { frames: [ { component: { type: 'wrapper', stylable: ['background'] } } ] } ],
+            }
+
+            return new Promise(resolve => {
+              setTimeout(() => { resolve(result) }, 500)
+            })
+          },
+        }),
+      ],
+      storageManager: {
+        type: 'example',
+        autoload: false,
+        autosave: false,
+      },
+    })
+
+    editor.load().then(() => {
+      console.log('Dirty count load()', editor.getDirtyCount())
+      setTimeout(() => { console.log('Dirty count after 1ms:', editor.getDirtyCount()) }, 1)
+    })
+  </script>
+</body>
+</html>
